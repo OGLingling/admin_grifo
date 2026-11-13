@@ -1,0 +1,14 @@
+{% extends "control/base.html" %}
+{% load static %}
+{% block title %}Iniciar sesión{% endblock %}
+{% block breadcrumb %}Acceso{% endblock %}
+{% block content %}
+<section class="login-wrap">
+  <div class="login-art"><img class="login-brand-logo" src="{% static 'control/img/logo-estacion-norte.png' %}" alt="Estación Norte"><div class="login-art-copy"><span>GESTIÓN DE GRIFO</span><h1>Todo el control<br>en un solo lugar.</h1><p>Ventas, inventario y caja con información clara para cada turno.</p></div><div class="login-art-foot">CONTROL · ORDEN · CONFIANZA</div></div>
+  <div class="login-panel"><div class="eyebrow">BIENVENIDO</div><h2>Ingresa a tu cuenta</h2><p class="muted">Usa tus credenciales de operador.</p>
+    {% if form.errors %}<div class="form-alert">Usuario o contraseña incorrectos. Revisa tus datos e inténtalo de nuevo.</div>{% endif %}
+    <form method="post" class="stack-form">{% csrf_token %}<input type="hidden" name="next" value="{{ next }}"><div class="field"><label for="id_username">Usuario</label><input id="id_username" type="text" name="username" autocomplete="username" required autofocus></div><div class="field"><label for="id_password">Contraseña</label><input id="id_password" type="password" name="password" autocomplete="current-password" required></div><button class="button button-primary button-wide" type="submit">Iniciar sesión <span>→</span></button></form>
+    <p class="login-hint">¿Necesitas acceso? Solicítalo al administrador del sistema.</p>
+  </div>
+</section>
+{% endblock %}

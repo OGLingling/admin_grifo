@@ -1,0 +1,20 @@
+{% extends "control/base.html" %}
+{% block title %}Resumen{% endblock %}
+{% block breadcrumb %}Resumen{% endblock %}
+{% block content %}
+<section class="page-heading"><div><div class="eyebrow">PANEL DE CONTROL · {{ today|date:"d F Y" }}</div><h1>Buenos días, {{ user.first_name|default:user.username }} <span class="wave">✦</span></h1><p>Este es el estado de tu estación para hoy.</p></div><a class="button button-primary" href="{% url 'ventas' %}">＋ Registrar venta</a></section>
+<section class="metric-grid">
+  <article class="metric-card metric-dark"><div class="metric-top"><span>VENTAS DE HOY</span><span class="metric-icon">↗</span></div><div class="metric-number">S/ {{ sales_total|floatformat:2 }}</div><div class="metric-foot">{{ sales_count }} operación{{ sales_count|pluralize:"es" }} registradas</div><div class="metric-spark spark-green">▁ ▃ ▂ ▅ ▄ ▇ ▆</div></article>
+  <article class="metric-card"><div class="metric-top"><span>PRODUCTOS ACTIVOS</span><span class="metric-icon icon-soft">◈</span></div><div class="metric-number">{{ products_count }}</div><div class="metric-foot">En el catálogo de la estación</div></article>
+  <article class="metric-card"><div class="metric-top"><span>TANQUES ACTIVOS</span><span class="metric-icon icon-soft">▥</span></div><div class="metric-number">{{ tanks_count }}</div><div class="metric-foot">Con lectura de existencias</div></article>
+  <article class="metric-card metric-cash"><div class="metric-top"><span>ESTADO DE CAJA</span><span class="status-pill {% if cash_session %}status-open{% else %}status-closed{% endif %}">{% if cash_session %}Abierta{% else %}Cerrada{% endif %}</span></div>{% if cash_session %}<div class="metric-number">S/ {{ cash_summary.expected|floatformat:2 }}</div><div class="metric-foot">Efectivo esperado en turno</div><a class="metric-link" href="{% url 'caja' %}">Ver caja →</a>{% else %}<div class="cash-empty">Lista para iniciar un turno</div><a class="metric-link" href="{% url 'caja' %}">Abrir caja →</a>{% endif %}</article>
+</section>
+<section class="content-grid">
+  <article class="panel panel-wide"><div class="panel-heading"><div><h2>Ventas recientes</h2><p>Actividad de hoy en la estación</p></div><a href="{% url 'ventas' %}" class="text-link">Ver ventas →</a></div>
+    {% if recent_sales %}<div class="table-wrap"><table><thead><tr><th>PRODUCTO</th><th>OPERADOR</th><th>HORA</th><th>PAGO</th><th class="align-right">TOTAL</th></tr></thead><tbody>{% for sale in recent_sales %}<tr><td><div class="product-cell"><span class="table-icon">◈</span><span><strong>{{ sale.product.name }}</strong><small>{% if sale.tank %}Tanque {{ sale.tank.code }}{% else %}Tienda{% endif %}</small></span></div></td><td>{{ sale.created_by.get_short_name|default:sale.created_by.username }}</td><td>{{ sale.sold_at|date:"H:i" }}</td><td><span class="payment-tag">{{ sale.get_payment_method_display }}</span></td><td class="align-right amount">S/ {{ sale.total|floatformat:2 }}</td></tr>{% endfor %}</tbody></table></div>{% else %}<div class="empty-state"><span>◌</span><strong>Aún no hay ventas hoy</strong><p>Las ventas registradas aparecerán aquí.</p></div>{% endif %}
+  </article>
+  <article class="panel"><div class="panel-heading"><div><h2>Nivel de tanques</h2><p>Existencias y alertas</p></div><a href="{% url 'tanques' %}" class="text-link">Ver todos</a></div>
+    {% if low_tanks %}<div class="tank-list">{% for tank in low_tanks %}<div class="tank-row"><div class="tank-row-top"><span><strong>{{ tank.code }}</strong><small>{{ tank.product.name }}</small></span><span class="tank-warning">Nivel bajo</span></div><div class="progress-track"><span class="progress-fill progress-low" style="width:{{ tank.fill_percent }}%"></span></div><div class="tank-row-bottom"><span>{{ tank.current_stock|floatformat:0 }} L</span><span>Cap. {{ tank.capacity|floatformat:0 }} L</span></div></div>{% endfor %}</div>{% else %}<div class="empty-state compact"><span>✓</span><strong>Todo en orden</strong><p>No hay tanques por debajo del mínimo.</p></div>{% endif %}
+  </article>
+</section>
+{% endblock %}
